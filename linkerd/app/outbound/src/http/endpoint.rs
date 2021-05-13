@@ -8,7 +8,7 @@ use linkerd_app_core::{
 use tokio::io;
 
 impl<C> Outbound<C> {
-    #[cfg(not(feature = "disabled"))]
+    #[cfg(not(feature = "enabled-endpoint"))]
     pub fn push_http_endpoint<T>(
         self,
     ) -> Outbound<
@@ -39,7 +39,7 @@ impl<C> Outbound<C> {
         }
     }
 
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled-endpoint")]
     pub fn push_http_endpoint<T, B>(
         self,
     ) -> Outbound<

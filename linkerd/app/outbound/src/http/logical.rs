@@ -13,15 +13,15 @@ use linkerd_app_core::{
 use tracing::debug_span;
 
 impl<E> Outbound<E> {
-    #[cfg(not(feature = "disabled"))]
-    pub fn push_http_logical<R>(
+    #[cfg(not(feature = "enabled-logical"))]
+    pub fn push_http_logical<B, ESvc, R>(
         self,
         resolve: R,
     ) -> Outbound<
         impl svc::NewService<
                 Logical,
                 Service = impl svc::Service<
-                    http::Request<http::BoxBody>,
+                    http::Request<B>,
                     Response = http::Response<http::BoxBody>,
                     Error = Error,
                     Future = impl Send,
@@ -29,7 +29,14 @@ impl<E> Outbound<E> {
             > + Clone,
     >
     where
-        E: svc::NewService<Endpoint> + Clone + Send + Sync + 'static,
+        B: http::HttpBody<Error = Error> + std::fmt::Debug + Default + Send + 'static,
+        B::Data: Send + 'static,
+        E: svc::NewService<Endpoint, Service = ESvc> + Clone + Send + Sync + 'static,
+        ESvc: svc::Service<http::Request<http::BoxBody>, Response = http::Response<http::BoxBody>>
+            + Send
+            + 'static,
+        ESvc::Error: Into<Error>,
+        ESvc::Future: Send,
     {
         #[derive(Debug, Default, thiserror::Error)]
         #[error("unimplemented")]
@@ -42,7 +49,7 @@ impl<E> Outbound<E> {
         }
     }
 
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled-logical")]
     pub fn push_http_logical<B, ESvc, R>(
         self,
         resolve: R,

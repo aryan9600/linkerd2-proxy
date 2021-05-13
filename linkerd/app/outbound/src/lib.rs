@@ -115,7 +115,7 @@ impl<S> Outbound<S> {
 }
 
 impl Outbound<()> {
-    #[cfg(not(feature = "disabled"))]
+    #[cfg(not(feature = "enabled"))]
     pub fn serve<B, P, R>(
         self,
         bind: B,
@@ -132,7 +132,7 @@ impl Outbound<()> {
         (listen_addr, futures::future::pending())
     }
 
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled")]
     pub fn serve<B, P, R>(
         self,
         bind: B,

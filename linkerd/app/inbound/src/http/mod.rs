@@ -24,7 +24,7 @@ use linkerd_app_core::{
 use tracing::debug_span;
 
 impl<H> Inbound<H> {
-    #[cfg(not(feature = "disabled"))]
+    #[cfg(not(feature = "enabled"))]
     pub fn push_http_server<T, I>(
         self,
     ) -> Inbound<
@@ -47,7 +47,7 @@ impl<H> Inbound<H> {
         }
     }
 
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled")]
     pub fn push_http_server<T, I, HSvc>(
         self,
     ) -> Inbound<

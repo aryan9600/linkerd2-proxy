@@ -69,6 +69,28 @@ struct RefusedNoTarget(());
 struct RefusedNotResolved(NameAddr);
 
 #[allow(clippy::too_many_arguments)]
+#[cfg(not(feature = "enabled"))]
+pub fn stack<I, O, P, R>(
+    Config { allow_discovery }: Config,
+    inbound: Inbound<()>,
+    outbound: Outbound<O>,
+    profiles: P,
+    resolve: R,
+) -> impl svc::NewService<
+    GatewayConnection,
+    Service = impl svc::Service<I, Response = (), Error = impl Into<Error>, Future = impl Send>
+                  + Send
+                  + 'static,
+> + Clone
+       + Send {
+    #[derive(Debug, Default, thiserror::Error)]
+    #[error("unimplemented")]
+    struct Unimpl;
+    svc::Fail::<_, Unimpl>::default()
+}
+
+#[allow(clippy::too_many_arguments)]
+#[cfg(feature = "enabled")]
 pub fn stack<I, O, P, R>(
     Config { allow_discovery }: Config,
     inbound: Inbound<()>,

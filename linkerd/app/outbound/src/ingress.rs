@@ -39,11 +39,36 @@ struct IngressHttpOnly;
 // === impl Outbound ===
 
 impl<H> Outbound<H> {
+    #[cfg(not(feature = "enabled-ingress"))]
+    pub fn into_ingress<T, I, HSvc, P>(
+        self,
+        profiles: P,
+    ) -> impl svc::NewService<
+        T,
+        Service = impl svc::Service<I, Response = (), Error = Error, Future = impl Send>,
+    >
+    where
+        T: Param<OrigDstAddr> + Clone + Send + Sync + 'static,
+        I: io::AsyncRead + io::AsyncWrite + io::PeerAddr + std::fmt::Debug + Send + Unpin + 'static,
+        H: svc::NewService<http::Logical, Service = HSvc> + Clone + Send + Sync + Unpin + 'static,
+        HSvc: svc::Service<http::Request<http::BoxBody>, Response = http::Response<http::BoxBody>>
+            + Send
+            + 'static,
+        HSvc::Error: Into<Error>,
+        HSvc::Future: Send,
+    {
+        #[derive(Debug, Default, thiserror::Error)]
+        #[error("unimplemented")]
+        struct Unimpl;
+
+        svc::Fail::<_, Unimpl>::default()
+    }
+
     /// Routes HTTP requests according to the l5d-dst-override header.
     ///
     /// This is only intended for Ingress configurations, where we assume all
     /// outbound traffic is HTTP.
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled-ingress")]
     pub fn into_ingress<T, I, HSvc, P>(
         self,
         profiles: P,

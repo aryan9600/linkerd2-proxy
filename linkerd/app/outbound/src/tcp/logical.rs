@@ -13,7 +13,7 @@ use linkerd_app_core::{
 use tracing::debug_span;
 
 impl<C> Outbound<C> {
-    #[cfg(not(feature = "disabled"))]
+    #[cfg(not(feature = "enabled-logical"))]
     pub fn push_tcp_logical<I, R>(
         self,
         resolve: R,
@@ -38,7 +38,7 @@ impl<C> Outbound<C> {
     }
 
     /// Constructs a TCP load balancer.
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled-logical")]
     pub fn push_tcp_logical<I, R>(
         self,
         resolve: R,

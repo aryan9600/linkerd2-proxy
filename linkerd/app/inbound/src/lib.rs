@@ -207,7 +207,7 @@ where
         }
     }
 
-    #[cfg(not(feature = "disabled"))]
+    #[cfg(not(feature = "enabled"))]
     pub fn into_server<T, I, G, P>(
         self,
         _server_port: u16,
@@ -223,7 +223,7 @@ where
         svc::Fail::<_, Unimpl>::default()
     }
 
-    #[cfg(feature = "disabled")]
+    #[cfg(feature = "enabled")]
     pub fn into_server<T, I, G, GSvc, P>(
         self,
         server_port: u16,

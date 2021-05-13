@@ -190,8 +190,37 @@ impl<P: Copy + std::fmt::Debug> MapEndpoint<Concrete<P>, Metadata> for FromMetad
 
 // === Outbound ===
 
-#[cfg(feature = "disabled")]
 impl<S> Outbound<S> {
+    #[cfg(not(feature = "enabled-endpoint"))]
+    pub fn push_endpoint<I>(
+        self,
+    ) -> Outbound<
+        impl svc::NewService<
+                tcp::Endpoint,
+                Service = impl svc::Service<I, Response = (), Error = Error, Future = impl Send>,
+            > + Clone,
+    >
+    where
+        Self: Clone + 'static,
+        S: svc::Service<tcp::Connect, Error = io::Error> + Clone + Send + Sync + Unpin + 'static,
+        S::Response:
+            tls::HasNegotiatedProtocol + io::AsyncRead + io::AsyncWrite + Send + Unpin + 'static,
+        S::Future: Send + Unpin,
+        I: io::AsyncRead + io::AsyncWrite + io::PeerAddr,
+        I: fmt::Debug + Send + Sync + Unpin + 'static,
+    {
+        #[derive(Debug, Default, thiserror::Error)]
+        #[error("unimplemented")]
+        struct Unimpl;
+
+        Outbound {
+            config: self.config,
+            runtime: self.runtime,
+            stack: svc::stack(svc::Fail::<_, Unimpl>::default()),
+        }
+    }
+
+    #[cfg(feature = "enabled-endpoint")]
     pub fn push_endpoint<I>(
         self,
     ) -> Outbound<
