@@ -13,6 +13,11 @@ This is used by tests and the executable.
 
 [features]
 allow-loopback = ["linkerd-app-outbound/allow-loopback"]
+enabled-outbound = ["linkerd-app-outbound/enabled"]
+enabled-outbound-detect = ["linkerd-app-outbound/enabled-detect"]
+enabled-outbound-endpoint = ["linkerd-app-outbound/enabled-endpoint"]
+enabled-outbound-ingress = ["linkerd-app-outbound/enabled-ingress"]
+enabled-outbound-logical = ["linkerd-app-outbound/enabled-logical"]
 
 [dependencies]
 futures = "0.3.9"

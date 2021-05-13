@@ -10,8 +10,45 @@ use tracing::debug_span;
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Skip;
 
-#[cfg(feature = "enabled")]
 impl<N> Outbound<N> {
+    #[cfg(not(feature = "enabled-detect"))]
+    pub fn push_detect_http<T, U, NSvc, H, HSvc, I>(
+        self,
+        http: H,
+    ) -> Outbound<
+        impl svc::NewService<
+                T,
+                Service = impl svc::Service<I, Response = (), Error = Error, Future = impl Send>,
+            > + Clone,
+    >
+    where
+        I: io::AsyncRead + io::AsyncWrite + io::PeerAddr,
+        I: std::fmt::Debug + Send + Sync + Unpin + 'static,
+        N: svc::NewService<T, Service = NSvc> + Clone + Send + Sync + 'static,
+        NSvc:
+            svc::Service<io::EitherIo<I, io::PrefixedIo<I>>, Response = ()> + Send + Sync + 'static,
+        NSvc::Error: Into<Error>,
+        NSvc::Future: Send,
+        H: svc::NewService<U, Service = HSvc> + Clone + Send + Sync + 'static,
+        HSvc: svc::Service<http::Request<http::BoxBody>, Response = http::Response<http::BoxBody>>,
+        HSvc: Clone + Send + Sync + Unpin + 'static,
+        HSvc::Error: Into<Error>,
+        HSvc::Future: Send,
+        T: Param<Option<Skip>> + Clone + Send + Sync + 'static,
+        U: From<(http::Version, T)> + svc::Param<http::Version> + 'static,
+    {
+        #[derive(Debug, Default, thiserror::Error)]
+        #[error("unimplemented")]
+        struct Unimpl;
+
+        Outbound {
+            config: self.config,
+            runtime: self.runtime,
+            stack: svc::stack(svc::Fail::<_, Unimpl>::default()),
+        }
+    }
+
+    #[cfg(feature = "enabled-detect")]
     pub fn push_detect_http<T, U, NSvc, H, HSvc, I>(
         self,
         http: H,

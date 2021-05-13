@@ -10,6 +10,11 @@ description = "The main proxy executable"
 [features]
 default = ["multicore"]
 multicore = ["tokio/rt-multi-thread", "num_cpus"]
+enabled-outbound = ["linkerd-app/enabled-outbound"]
+enabled-outbound-detect = ["linkerd-app/enabled-outbound-detect"]
+enabled-outbound-endpoint = ["linkerd-app/enabled-outbound-endpoint"]
+enabled-outbound-ingress = ["linkerd-app/enabled-outbound-ingress"]
+enabled-outbound-logical = ["linkerd-app/enabled-outbound-logical"]
 
 [dependencies]
 futures = "0.3.9"

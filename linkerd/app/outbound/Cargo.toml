@@ -10,11 +10,12 @@ Configures and runs the outbound proxy
 """
 
 [features]
-default = ["enabled"]
+default = []
 enabled = []
-enabled-logical = []
+enabled-detect = []
 enabled-endpoint = []
 enabled-ingress = []
+enabled-logical = []
 allow-loopback = []
 test-subscriber = []
 
